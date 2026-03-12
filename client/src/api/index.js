@@ -1,16 +1,22 @@
-import axios from 'axios'
+import axios from "axios";
 
-const api = axios.create({ baseURL: '/api' })
+const BASE_URL = "http://localhost:8000";
 
-export async function analyseRequest(spotRequest, rawQuotes) {
-  const { data } = await api.post('/analyse', {
+const api = axios.create({
+  baseURL: BASE_URL,
+  timeout: 30000,
+  headers: { "Content-Type": "application/json" },
+});
+
+// ─── Health Check ─────────────────────────────────────────────────────────────
+export const checkHealth = () => api.get("/health");
+
+// ─── Main Analysis Endpoint ───────────────────────────────────────────────────
+// POST /api/analyse  → { ranked_quotes, recommendation, lane_context }
+export const analyseQuotes = (spotRequest, rawQuotes) =>
+  api.post("/api/analyse", {
     spot_request: spotRequest,
     raw_quotes: rawQuotes,
-  })
-  return data
-}
+  });
 
-export async function healthCheck() {
-  const { data } = await api.get('/health')
-  return data
-}
+export default api;
