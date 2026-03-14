@@ -86,3 +86,43 @@ class AIRecommendation(BaseModel):
 class RecommendResponse(BaseModel):
     recommendation: AIRecommendation
     used_fallback: bool = False
+
+
+# ── Simplified input models for the unified /api/analyse endpoint ─────────────
+# The caller only needs to supply bare minimum info — the server enriches everything.
+
+class RawQuoteInput(BaseModel):
+    """Bare quote as submitted by an LSP — no profile data needed from caller."""
+    id: str
+    lsp: str
+    raw_quote: float
+    transit_days: int
+    availability: str                   # "Immediate" | "Next Day" | etc.
+    trucks_available: Optional[int] = None
+
+
+class SpotRequestInput(BaseModel):
+    """Inbound spot freight request — no predicted/benchmark rates needed from caller."""
+    id: str
+    origin: str
+    destination: str
+    truck_type: str
+    urgency: str                        # HIGH / MEDIUM / LOW
+    cost_threshold: float
+    trucks_required: int = 1
+    placement_date: Optional[str] = None
+    additional_details: Optional[str] = None
+
+
+class AnalyseRequest(BaseModel):
+    """Single payload the frontend posts to /api/analyse."""
+    spot_request: SpotRequestInput
+    raw_quotes: List[RawQuoteInput]
+
+
+class AnalyseResponse(BaseModel):
+    """Full result returned by /api/analyse."""
+    ranked_quotes: List[ScoredQuote]
+    recommendation: AIRecommendation
+    lane_context: dict                  # predicted_rate, benchmark_rate, demand_index, etc.
+    used_fallback: bool = False

@@ -11,12 +11,18 @@ const api = axios.create({
 // ─── Health Check ─────────────────────────────────────────────────────────────
 export const checkHealth = () => api.get("/health");
 
-// ─── Main Analysis Endpoint ───────────────────────────────────────────────────
-// POST /api/analyse  → { ranked_quotes, recommendation, lane_context }
+// ─── Unified Analysis Endpoint ────────────────────────────────────────────────
+// POST /api/analyse
+// Payload:  { spot_request: SpotRequestInput, raw_quotes: RawQuoteInput[] }
+// Response: { ranked_quotes, recommendation, lane_context, used_fallback }
 export const analyseQuotes = (spotRequest, rawQuotes) =>
   api.post("/api/analyse", {
     spot_request: spotRequest,
-    raw_quotes: rawQuotes,
+    raw_quotes:   rawQuotes,
   });
+
+// ─── Demo Scenario Loader ─────────────────────────────────────────────────────
+// GET /api/scenarios → returns the 6 pre-built demo scenarios array
+export const getScenarios = () => api.get("/api/scenarios");
 
 export default api;
