@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+
+/* ── Design Tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --primary:        #393185;
+  --primary-hover:  #2d2570;
+  --primary-dim:    rgba(57, 49, 133, 0.08);
+  --primary-mid:    rgba(57, 49, 133, 0.16);
+
+  --bg:             #F5F5FA;
+  --surface:        #FFFFFF;
+  --surface-2:      #F0F0F8;
+  --border:         #E4E4EF;
+  --border-strong:  #CCCCE0;
+
+  --text-primary:   #111128;
+  --text-secondary: #6B6B8D;
+  --text-muted:     #9999B8;
+
+  --green:          #15803D;
+  --green-bg:       #F0FDF4;
+  --green-border:   #BBF7D0;
+  --amber:          #B45309;
+  --amber-bg:       #FFFBEB;
+  --amber-border:   #FDE68A;
+  --red:            #DC2626;
+  --red-bg:         #FEF2F2;
+  --red-border:     #FECACA;
+
+  --radius-sm:  4px;
+  --radius:     6px;
+  --radius-md:  8px;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow:     0 2px 8px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+
+  --transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Utilities ─────────────────────────────────────────────────────────────── */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+/* ── Animations ─────────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.anim-fade-up { animation: fadeUp 0.4s ease forwards; }
+
+/* ── Scrollbar ──────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }

@@ -1,116 +1,132 @@
 import React from "react";
 
-const COLORS = {
-  navy: "#0D1B2A",
-  navyLight: "#162032",
-  accent: "#1E90FF",
-  accentDim: "#1565C0",
-  textPrimary: "#FFFFFF",
-  textSecondary: "#94A3B8",
-  border: "#1E3A5F",
+const S = {
+  nav: {
+    background: "#FFFFFF",
+    borderBottom: "1px solid var(--border)",
+    padding: "0 40px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: 56,
+    position: "sticky",
+    top: 0,
+    zIndex: 100,
+  },
+  logo: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    cursor: "pointer",
+  },
+  logoMark: {
+    width: 28,
+    height: 28,
+    background: "var(--primary)",
+    borderRadius: 6,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: 700,
+    letterSpacing: "-0.5px",
+  },
+  logoText: {
+    fontSize: 15,
+    fontWeight: 700,
+    color: "var(--text-primary)",
+    letterSpacing: "-0.3px",
+  },
+  modulePill: {
+    fontSize: 11,
+    fontWeight: 600,
+    color: "var(--primary)",
+    background: "var(--primary-dim)",
+    padding: "2px 8px",
+    borderRadius: 4,
+    letterSpacing: "0.3px",
+    textTransform: "uppercase",
+  },
+  breadcrumb: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    fontSize: 12,
+    color: "var(--text-muted)",
+  },
+  breadcrumbActive: {
+    color: "var(--text-secondary)",
+    fontWeight: 500,
+  },
+  sep: { color: "var(--border-strong)" },
 };
 
-const Topbar = ({ currentStep }) => {
+export default function Topbar({ page, selectedScenario, onLogoClick, onSpotListClick }) {
+  const req = selectedScenario?.spot_request;
+
   return (
-    <div
-      style={{
-        background: COLORS.navy,
-        borderBottom: `1px solid ${COLORS.border}`,
-        padding: "0 32px",
-        height: "56px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-      }}
-    >
-      {/* Left: Brand */}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <div
-          style={{
-            width: "32px",
-            height: "32px",
-            background: "linear-gradient(135deg, #1E90FF 0%, #0052CC 100%)",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "14px",
-            fontWeight: 800,
-            color: "#fff",
-            letterSpacing: "-0.5px",
-          }}
-        >
-          L
+    <nav style={S.nav}>
+      {/* Left: Logo */}
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={S.logo} onClick={onLogoClick}>
+          <div style={S.logoMark}>L</div>
+          <span style={S.logoText}>LoRRI</span>
         </div>
-        <div>
-          <span
-            style={{
-              color: COLORS.textPrimary,
-              fontSize: "15px",
-              fontWeight: 700,
-              letterSpacing: "0.3px",
-            }}
-          >
-            LoRRI
-          </span>
-          <span
-            style={{
-              color: COLORS.textSecondary,
-              fontSize: "13px",
-              marginLeft: "8px",
-              fontWeight: 400,
-            }}
-          >
-            Spot Procurement Agent
-          </span>
-        </div>
-      </div>
-
-      {/* Right: Step indicator + meta */}
-      <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+        <div style={{ width: 1, height: 18, background: "var(--border)" }} />
         <span
-          style={{
-            color: COLORS.textSecondary,
-            fontSize: "12px",
-            fontFamily: "monospace",
-          }}
+          style={{ ...S.modulePill, cursor: page > 1 ? "pointer" : "default" }}
+          onClick={page > 1 ? onSpotListClick : undefined}
         >
-          SR-2024-0315-001
+          Spot
         </span>
-        <div
-          style={{
-            background: COLORS.navyLight,
-            border: `1px solid ${COLORS.border}`,
-            borderRadius: "20px",
-            padding: "3px 12px",
-            fontSize: "12px",
-            color: COLORS.textSecondary,
-          }}
-        >
-          Step {currentStep} / 4
-        </div>
-        <div
-          style={{
-            width: "28px",
-            height: "28px",
-            borderRadius: "50%",
-            background: "#1E3A5F",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "12px",
-            color: COLORS.textSecondary,
-            cursor: "pointer",
-          }}
-        >
-          ⚙
-        </div>
       </div>
-    </div>
-  );
-};
 
-export default Topbar;
+      {/* Center: Breadcrumb (only on spot screens) */}
+      {page >= 2 && req && (
+        <div style={S.breadcrumb}>
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={onSpotListClick}
+          >
+            Spot Requests
+          </span>
+          <span style={S.sep}>/</span>
+          <span style={S.breadcrumbActive}>
+            {req.origin?.split(",")[0]} → {req.destination?.split(",")[0]}
+          </span>
+          {page === 3 && (
+            <>
+              <span style={S.sep}>/</span>
+              <span style={S.breadcrumbActive}>Analysing</span>
+            </>
+          )}
+          {page === 4 && (
+            <>
+              <span style={S.sep}>/</span>
+              <span style={S.breadcrumbActive}>Recommendation</span>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Right: Step indicator */}
+      {page >= 1 && page <= 4 && (
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {[1, 2, 3, 4].map(n => (
+            <div
+              key={n}
+              style={{
+                width: n === page - 0 ? 20 : 6,
+                height: 6,
+                borderRadius: 99,
+                background: n <= page - 0 ? "var(--primary)" : "var(--border)",
+                transition: "all 0.3s ease",
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </nav>
+  );
+}
