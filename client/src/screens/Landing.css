@@ -1,0 +1,911 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Geist:wght@300;400;500;600;700&display=swap');
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    /* ── Palette ── */
+    --ink: #0A0814;
+    --ink-2: #1E1A38;
+    --purple: #5B47E0;
+    --purple-mid: #7B6CF0;
+    --purple-light: #EAE7FD;
+    --purple-bg: #F4F2FF;
+    --bg: #FFFFFF;
+    --surface: #FAFAFA;
+    --surface-2: #F4F2FF;
+    --border: #E8E5F0;
+    --border-mid: #D4CFF0;
+    --text: #0A0814;
+    --text-2: #3D3860;
+    --text-muted: #7B7599;
+    --green: #00C07A;
+    --green-bg: #E6FAF3;
+    --green-border: #99E8CE;
+    --red: #E8294A;
+    --red-bg: #FEE8EC;
+    --red-border: #F5AABB;
+    --amber: #D97706;
+    --amber-bg: #FEF3C7;
+    --amber-border: #FDE68A;
+    --radius: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --t: 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Page ── */
+.lorri-page {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geist', sans-serif;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Subtle dot grid */
+.lorri-page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(91, 71, 224, 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Big hero gradient splash behind hero */
+.lorri-bg-splash {
+    position: absolute;
+    top: 56px;
+    left: 0;
+    right: 0;
+    height: 560px;
+    background: linear-gradient(160deg, #F4F2FF 0%, #EDE9FE 40%, #FFFFFF 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ─────────────────────────────────────────────────────
+   NAV — split two-tone bar (bright version)
+   [ BRAND SLAB ] [ context crumbs ] [ CTA ]
+───────────────────────────────────────────────────── */
+.lorri-nav {
+    position: relative;
+    z-index: 100;
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: stretch;
+    background: var(--bg);
+    border-bottom: 1.5px solid var(--border);
+}
+
+/* Left brand slab — vivid purple */
+.lorri-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 28px;
+    background: var(--purple);
+    border-right: none;
+    flex-shrink: 0;
+    position: relative;
+    cursor: pointer;
+}
+
+/* diagonal cut on right edge of brand slab */
+.lorri-nav-brand::after {
+    content: '';
+    position: absolute;
+    right: -14px;
+    top: 0;
+    bottom: 0;
+    width: 28px;
+    background: var(--purple);
+    clip-path: polygon(0 0, 60% 0, 100% 50%, 60% 100%, 0 100%);
+    z-index: 1;
+}
+
+.lorri-logo-mark {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: #fff;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.lorri-logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: -0.5px;
+    color: #fff;
+    position: relative;
+    z-index: 2;
+}
+
+.lorri-logo-product {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    display: block;
+    margin-top: 1px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Middle context strip */
+.lorri-nav-context {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 32px 0 42px;
+    gap: 0;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+.lorri-nav-crumb {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    padding-right: 20px;
+    border-right: 1.5px solid var(--border);
+    margin-right: 20px;
+}
+
+.lorri-nav-crumb:last-child {
+    border-right: none;
+    margin-right: 0;
+}
+
+.lorri-nav-crumb .label {
+    color: var(--text-muted);
+}
+
+.lorri-nav-crumb .value {
+    color: var(--ink-2);
+    font-weight: 500;
+}
+
+.lorri-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.lorri-status-dot.green {
+    background: var(--green);
+    box-shadow: 0 0 0 2px var(--green-bg);
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.lorri-status-dot.amber {
+    background: var(--amber);
+    box-shadow: 0 0 0 2px var(--amber-bg);
+}
+
+/* Right CTA block */
+.lorri-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+    border-left: 1.5px solid var(--border);
+    flex-shrink: 0;
+}
+
+.lorri-btn-nav {
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: var(--radius-md);
+    font-family: 'Geist', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--t);
+    letter-spacing: -0.1px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 12px rgba(91, 71, 224, 0.28);
+}
+
+.lorri-btn-nav:hover {
+    background: #4A38D4;
+    box-shadow: 0 4px 20px rgba(91, 71, 224, 0.4);
+    transform: translateY(-1px);
+}
+
+/* ── Hero ── */
+.lorri-hero {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 80px 48px 72px;
+    align-items: center;
+}
+
+/* Domain strip */
+.lorri-domain-strip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.lorri-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.4px;
+    font-weight: 500;
+}
+
+.lorri-chip.primary-domain {
+    background: var(--amber-bg);
+    border: 1.5px solid var(--amber-border);
+    color: var(--amber);
+}
+
+.lorri-chip.secondary {
+    background: var(--surface-2);
+    border: 1.5px solid var(--border-mid);
+    color: var(--text-2);
+}
+
+/* H1 */
+.lorri-h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 52px;
+    line-height: 1.0;
+    letter-spacing: -2.8px;
+    color: var(--ink);
+    margin-bottom: 4px;
+}
+
+.lorri-h1-accent {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 52px;
+    line-height: 1.05;
+    letter-spacing: -2.8px;
+    color: var(--purple);
+    margin-bottom: 24px;
+}
+
+.lorri-subline {
+    font-size: 15.5px;
+    line-height: 1.75;
+    color: var(--text-2);
+    margin-bottom: 28px;
+    max-width: 440px;
+    font-weight: 400;
+}
+
+.lorri-subline strong {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+/* Proof bar */
+.lorri-proof-bar {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 32px;
+    border: 1.5px solid var(--border-mid);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--bg);
+    border-left: 3px solid var(--purple);
+}
+
+.lorri-proof-item {
+    padding: 13px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.lorri-proof-item+.lorri-proof-item {
+    border-left: 1.5px solid var(--border);
+}
+
+.lorri-proof-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -1px;
+    line-height: 1;
+}
+
+.lorri-proof-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    line-height: 1.4;
+}
+
+/* CTA */
+.lorri-cta-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.lorri-btn-hero {
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    padding: 13px 28px;
+    border-radius: var(--radius-md);
+    font-family: 'Geist', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    transition: all var(--t);
+    box-shadow: 0 4px 24px rgba(91, 71, 224, 0.32);
+    letter-spacing: -0.2px;
+}
+
+.lorri-btn-hero:hover {
+    background: #4A38D4;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 36px rgba(91, 71, 224, 0.44);
+}
+
+.lorri-btn-hero .arr {
+    display: inline-block;
+    transition: transform var(--t);
+}
+
+.lorri-btn-hero:hover .arr {
+    transform: translateX(5px);
+}
+
+.lorri-btn-ghost {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Geist', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color var(--t);
+}
+
+.lorri-btn-ghost:hover {
+    color: var(--text-2);
+}
+
+/* ── Preview Card ── */
+.lorri-card {
+    background: var(--bg);
+    border: 1.5px solid var(--border-mid);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+        0 4px 6px rgba(91, 71, 224, 0.05),
+        0 20px 60px rgba(91, 71, 224, 0.1),
+        0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+/* top accent line in purple */
+.lorri-card-topline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--purple) 0%, var(--purple-mid) 100%);
+}
+
+.lorri-card-header {
+    padding: 14px 18px;
+    border-bottom: 1.5px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--purple-bg);
+}
+
+.lorri-card-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.lorri-card-route {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Geist', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.3px;
+}
+
+.lorri-route-icon {
+    display: flex;
+    align-items: center;
+    color: var(--purple);
+    opacity: 0.8;
+}
+
+.lorri-badge-high {
+    background: var(--red-bg);
+    border: 1.5px solid var(--red-border);
+    color: var(--red);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.7px;
+    padding: 4px 9px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.lorri-card-meta {
+    padding: 9px 18px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1.5px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+    background: var(--surface);
+}
+
+.lorri-meta-sep {
+    width: 1.5px;
+    height: 11px;
+    background: var(--border-mid);
+    margin: 0 11px;
+    flex-shrink: 0;
+}
+
+.lorri-quote-thead {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 18px;
+    border-bottom: 1.5px solid var(--border);
+    background: var(--surface);
+}
+
+.lorri-quote-th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.lorri-quotes {
+    padding: 0;
+}
+
+.lorri-quote-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 18px;
+    transition: background var(--t);
+    position: relative;
+}
+
+.lorri-quote-row:hover {
+    background: var(--purple-bg);
+}
+
+.lorri-quote-row+.lorri-quote-row {
+    border-top: 1.5px solid var(--border);
+}
+
+.lorri-quote-row.best::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--green);
+}
+
+.lorri-quote-row.best {
+    background: var(--green-bg);
+}
+
+.lorri-quote-row.best:hover {
+    background: #DDFAEE;
+}
+
+.lorri-lsp-name {
+    font-family: 'Geist', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    display: block;
+}
+
+.lorri-lsp-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.2px;
+}
+
+.lorri-quote-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lorri-rate {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+}
+
+.lorri-delta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+
+.lorri-delta.ok {
+    background: var(--green-bg);
+    color: var(--green);
+    border: 1.5px solid var(--green-border);
+}
+
+.lorri-delta.bad {
+    background: var(--red-bg);
+    color: var(--red);
+    border: 1.5px solid var(--red-border);
+}
+
+/* AI Rec */
+.lorri-ai-rec {
+    margin: 10px 12px 12px;
+    background: linear-gradient(135deg, var(--purple-bg) 0%, var(--purple-light) 100%);
+    border: 1.5px solid var(--border-mid);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.lorri-ai-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--purple);
+    letter-spacing: 1px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+}
+
+.lorri-ai-verdict {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.4px;
+}
+
+.lorri-ai-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.lorri-confidence {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 500;
+}
+
+.lorri-conf-bar {
+    width: 64px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.lorri-conf-fill {
+    height: 100%;
+    width: 91%;
+    background: linear-gradient(90deg, var(--green), #4EFFB8);
+    border-radius: 3px;
+}
+
+/* ── Stats ── */
+.lorri-stats {
+    position: relative;
+    z-index: 1;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 48px 60px;
+}
+
+.lorri-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1.5px solid var(--border-mid);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--bg);
+}
+
+.lorri-stat-cell {
+    padding: 28px 30px;
+    position: relative;
+}
+
+.lorri-stat-cell+.lorri-stat-cell {
+    border-left: 1.5px solid var(--border);
+}
+
+/* top stripe per cell */
+.lorri-stat-cell::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+}
+
+.lorri-stat-cell:nth-child(1)::before {
+    background: var(--purple);
+}
+
+.lorri-stat-cell:nth-child(2)::before {
+    background: var(--red);
+}
+
+.lorri-stat-cell:nth-child(3)::before {
+    background: var(--green);
+}
+
+.lorri-stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -1.5px;
+    margin-bottom: 6px;
+    line-height: 1;
+}
+
+.lorri-stat-label {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+/* ── How It Works ── */
+.lorri-how {
+    position: relative;
+    z-index: 1;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 48px 80px;
+}
+
+.lorri-section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+}
+
+.lorri-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1.5px;
+    background: var(--border);
+}
+
+.lorri-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1.5px solid var(--border-mid);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.lorri-step {
+    background: var(--bg);
+    padding: 28px 22px 24px;
+    position: relative;
+    transition: background var(--t);
+    border-right: 1.5px solid var(--border);
+}
+
+.lorri-step:last-child {
+    border-right: none;
+}
+
+.lorri-step:hover {
+    background: var(--purple-bg);
+}
+
+/* colored top accent per step */
+.lorri-step::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--purple);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lorri-step:hover::before {
+    transform: scaleX(1);
+}
+
+.lorri-step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--border-mid);
+    line-height: 1;
+    margin-bottom: 14px;
+    letter-spacing: -3px;
+    transition: color var(--t);
+}
+
+.lorri-step:hover .lorri-step-num {
+    color: var(--purple-mid);
+}
+
+.lorri-step-title {
+    font-family: 'Geist', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+}
+
+.lorri-step-desc {
+    font-size: 12.5px;
+    color: var(--text-2);
+    line-height: 1.65;
+    font-weight: 400;
+}
+
+/* ── Animations ── */
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 2px var(--green-bg);
+    }
+
+    50% {
+        box-shadow: 0 0 0 4px var(--green-bg);
+    }
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.lorri-fade-up {
+    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.lorri-fade-up-1 {
+    opacity: 0;
+    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s forwards;
+}
+
+.lorri-fade-up-2 {
+    opacity: 0;
+    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.14s forwards;
+}
+
+.lorri-fade-up-3 {
+    opacity: 0;
+    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.22s forwards;
+}
+
+.lorri-fade-up-4 {
+    opacity: 0;
+    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.32s forwards;
+}
+
+.lorri-fade-up-5 {
+    opacity: 0;
+    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.42s forwards;
+}
