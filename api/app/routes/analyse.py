@@ -14,7 +14,7 @@ from app.data_loader import get_lsp_profile, get_lane_context
 from app.services.rate_prediction import get_predicted_rate
 from app.services.benchmark import get_benchmark_rate, compute_demand_index
 
-router = APIRouter(prefix="/api")
+router = APIRouter()
 logger = logging.getLogger(__name__)
 
 # ── Path to demo scenarios JSON ───────────────────────────────────────────────
