@@ -278,7 +278,7 @@ export default function Screen4({ scenario, result, onRerun, onBack }) {
             { label: "Predicted Rate",  value: `₹${Number(lane_context.predicted_rate).toLocaleString("en-IN")}` },
             { label: "Benchmark",       value: `₹${Number(lane_context.benchmark_rate || 0).toLocaleString("en-IN")}` },
             { label: "Demand Index",    value: `${((lane_context.demand_index || 0) * 100).toFixed(0)}%` },
-            { label: "Lane Sample",     value: `${lane_context.lane_sample_size || "—"} shipments` },
+            // { label: "Lane Sample",     value: `${lane_context.lane_sample_size || "—"} shipments` },
           ].map(c => (
             <div key={c.label} style={{ flex: 1, background: "var(--surface)", padding: "12px 16px", textAlign: "center" }}>
               <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600, letterSpacing: "0.4px", textTransform: "uppercase", marginBottom: 4 }}>{c.label}</div>
