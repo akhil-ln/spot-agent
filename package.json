@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "client": "cd client && npm run dev",
-    "server": "cd server && venv\\Scripts\\uvicorn main:app --reload --port 8000",
-    "dev": "concurrently \"npm run client\" \"npm run server\""
+    "api": "cd api && venv\\Scripts\\uvicorn main:app --reload --port 8000",
+    "dev": "concurrently \"npm run client\" \"npm run api\""
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

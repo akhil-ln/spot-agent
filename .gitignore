@@ -3,12 +3,12 @@ venv
 
 __pycache__/
 
-server/venv/
-server/__pycache__/
-server/**/__pycache__/
+api/venv/
+api/__pycache__/
+api/**/__pycache__/
 *.pyc
 client/node_modules/
 client/dist/
 node_modules/
 .env
-server/data/*.csv
+api/data/*.csv

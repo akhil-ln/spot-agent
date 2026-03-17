@@ -22,3 +22,8 @@ from app.routes.analyse import router as analyse_router
 
 app.include_router(health_router)
 app.include_router(analyse_router)
+
+
+@app.get("/")
+def home():
+    return {"message": "API working"}

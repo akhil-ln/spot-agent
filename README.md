@@ -19,7 +19,7 @@ spot-agent/
 ├── client/           # React (Vite) frontend application
 │   ├── src/          # Source code including components, screens, and API calls
 │   └── package.json  # Frontend dependencies and scripts
-├── server/           # FastAPI backend application
+├── api/           # FastAPI backend application
 │   ├── app/          # Core backend logic and route handlers
 │   └── main.py       # FastAPI application entry point
 └── .env              # Environment variables (shared configuration)
@@ -48,10 +48,10 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 ### 2. Backend Setup (FastAPI)
 
-Navigate to the `server` directory and set up your Python environment.
+Navigate to the `api` directory and set up your Python environment.
 
 ```bash
-cd server
+cd api
 
 # Create a virtual environment
 python -m venv venv
