@@ -1,6 +1,6 @@
 import React from "react";
 import "./Landing.css";
-import { Truck } from "lucide-react";
+import { Box, Truck } from "lucide-react";
 
 function PreviewCard() {
   return (
@@ -10,7 +10,7 @@ function PreviewCard() {
       <div className="lorri-card-header">
         <div>
           <div className="lorri-card-eyebrow">
-            <span>📦</span>
+            <Box size={14} />
             Spot Request · SR-2847
           </div>
           <div className="lorri-card-route">
@@ -136,12 +136,12 @@ export default function Landing({ onEnter }) {
           <h1 className="lorri-h1 lorri-fade-up-1">Stop guessing.</h1>
           <span className="lorri-h1-accent lorri-fade-up-1">Start deciding.</span>
 
-          <p className="lorri-subline lorri-fade-up-2">
+          {/* <p className="lorri-subline lorri-fade-up-2">
             Every day your team manually compares truck quotes — calling transporters,
             cross-checking spot rates, guessing on reliability.{" "}
             <strong>LoRRI Spot evaluates every FTL quote in 5 seconds</strong> and tells
             you exactly what to do: accept, negotiate, or reject.
-          </p>
+          </p> */}
 
           <div className="lorri-proof-bar lorri-fade-up-2">
             <div className="lorri-proof-item">
@@ -171,7 +171,7 @@ export default function Landing({ onEnter }) {
       </section>
 
       {/* ── Stats ── */}
-      <div className="lorri-stats">
+      {/* <div className="lorri-stats">
         <div className="lorri-stats-grid">
           {[
             { num: "2–3 hrs",   label: "Average time to manually evaluate a spot freight request" },
@@ -184,11 +184,11 @@ export default function Landing({ onEnter }) {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* ── How It Works ── */}
       <div className="lorri-how">
-        <div className="lorri-section-label">How it works</div>
+        {/* <div className="lorri-section-label">How it works</div> */}
         <div className="lorri-steps">
           {[
             {

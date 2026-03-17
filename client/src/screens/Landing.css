@@ -34,7 +34,7 @@
     --amber-bg: #FEF3C7;
     --amber-border: #FDE68A;
     --radius: 6px;
-    --radius-md: 10px;
+    --radius-md: 6px;
     --radius-lg: 14px;
     --t: 0.16s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -93,7 +93,7 @@
     align-items: center;
     gap: 11px;
     padding: 0 28px;
-    background: var(--purple);
+    background: var(--primary);
     border-right: none;
     flex-shrink: 0;
     position: relative;
@@ -108,7 +108,7 @@
     top: 0;
     bottom: 0;
     width: 28px;
-    background: var(--purple);
+    background: var(--primary);
     clip-path: polygon(0 0, 60% 0, 100% 50%, 60% 100%, 0 100%);
     z-index: 1;
 }
@@ -221,7 +221,7 @@
 }
 
 .lorri-btn-nav {
-    background: var(--purple);
+    background: var(--primary);
     color: #fff;
     border: none;
     padding: 8px 20px;
@@ -252,7 +252,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 56px;
-    max-width: 1160px;
+    max-width: 1280px;
     margin: 0 auto;
     padding: 80px 48px 72px;
     align-items: center;
@@ -309,7 +309,7 @@
     font-size: 52px;
     line-height: 1.05;
     letter-spacing: -2.8px;
-    color: var(--purple);
+    color: var(--primary);
     margin-bottom: 24px;
 }
 
@@ -336,7 +336,7 @@
     border-radius: var(--radius-md);
     overflow: hidden;
     background: var(--bg);
-    border-left: 3px solid var(--purple);
+    border-left: 3px solid var(--primary);
 }
 
 .lorri-proof-item {
@@ -377,7 +377,7 @@
 }
 
 .lorri-btn-hero {
-    background: var(--purple);
+    background: var(--primary);
     color: #fff;
     border: none;
     padding: 13px 28px;
@@ -395,7 +395,7 @@
 }
 
 .lorri-btn-hero:hover {
-    background: #4A38D4;
+    background: var(--primary-hover);
     transform: translateY(-2px);
     box-shadow: 0 8px 36px rgba(91, 71, 224, 0.44);
 }
@@ -444,7 +444,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--purple) 0%, var(--purple-mid) 100%);
+    background: linear-gradient(90deg, var(--primary) 0%, var(--purple-mid) 100%);
 }
 
 .lorri-card-header {
@@ -483,7 +483,7 @@
 .lorri-route-icon {
     display: flex;
     align-items: center;
-    color: var(--purple);
+    color: var(--primary);
     opacity: 0.8;
 }
 
@@ -641,7 +641,7 @@
 .lorri-ai-label {
     font-family: 'DM Mono', monospace;
     font-size: 9px;
-    color: var(--purple);
+    color: var(--primary);
     letter-spacing: 1px;
     font-weight: 500;
     display: block;
@@ -725,7 +725,7 @@
 }
 
 .lorri-stat-cell:nth-child(1)::before {
-    background: var(--purple);
+    background: var(--primary);
 }
 
 .lorri-stat-cell:nth-child(2)::before {
@@ -815,7 +815,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: var(--purple);
+    background: var(--primary);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);

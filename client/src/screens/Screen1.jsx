@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Screen1.css";
+import CreateEnquiryPanel from "./CreateEnquiryPanel.jsx";
 import {
   Truck,
   Hash,
@@ -14,6 +15,7 @@ import {
   Info,
   MessageSquare,
   ChevronRight,
+  Plus,
 } from "lucide-react";
 
 function formatDate(str) {
@@ -31,23 +33,11 @@ function formatDate(str) {
 
 function UrgencyBadge({ urgency }) {
   const configs = {
-    HIGH: {
-      cls: "sr1-badge--high",
-      Icon: Flame,
-    },
-    MEDIUM: {
-      cls: "sr1-badge--medium",
-      Icon: CircleAlert,
-    },
-    LOW: {
-      cls: "sr1-badge--low",
-      Icon: CircleCheck,
-    },
+    HIGH: { cls: "sr1-badge--high", Icon: Flame },
+    MEDIUM: { cls: "sr1-badge--medium", Icon: CircleAlert },
+    LOW: { cls: "sr1-badge--low", Icon: CircleCheck },
   };
-  const { cls, Icon } = configs[urgency] || {
-    cls: "sr1-badge--low",
-    Icon: CircleCheck,
-  };
+  const { cls, Icon } = configs[urgency] || { cls: "sr1-badge--low", Icon: CircleCheck };
   return (
     <span className={`sr1-badge ${cls}`}>
       <Icon size={9} />
@@ -77,7 +67,6 @@ function RequestCard({ scenario, onClick }) {
       onMouseLeave={() => setHover(false)}
       className={`sr1-card ${hover ? "sr1-card--hover" : ""}`}
     >
-      {/* Top Row */}
       <div className="sr1-card__top">
         <div>
           <div className="sr1-card__meta">
@@ -97,7 +86,6 @@ function RequestCard({ scenario, onClick }) {
         <UrgencyBadge urgency={req.urgency} />
       </div>
 
-      {/* Chips */}
       <div className="sr1-card__chips">
         <Chip icon={Truck} label={req.truck_type} />
         <Chip
@@ -113,7 +101,6 @@ function RequestCard({ scenario, onClick }) {
         )}
       </div>
 
-      {/* Bottom Row */}
       <div className="sr1-card__bottom">
         <div className="sr1-card__quote-count">
           <MessageSquare size={13} />
@@ -137,30 +124,56 @@ function SkeletonCard() {
   );
 }
 
-export default function Screen1({ scenarios, loading, onSelect }) {
+export default function Screen1({ scenarios, loading, onSelect, onEnquirySubmit }) {
+  const [showPanel, setShowPanel] = useState(true);
+
   return (
-    <div className="sr1-container">
-      <div className="sr1-header">
-        <h1 className="sr1-header__title">
-          <Truck size={20} className="sr1-header__icon" />
-          Active spot requests
-        </h1>
-        <p className="sr1-header__sub">
-          Select a shipment to view transporter quotes and run AI analysis.
-        </p>
+    <div className="sr1-page">
+      {/* Left: list */}
+      <div className="sr1-main">
+        <div className="sr1-header">
+          <div className="sr1-header__left">
+            <h1 className="sr1-header__title">
+              <Truck size={20} className="sr1-header__icon" />
+              Active spot requests
+            </h1>
+            <p className="sr1-header__sub">
+              Select a shipment to view transporter quotes and run AI analysis.
+            </p>
+          </div>
+          {!showPanel && (
+            <button
+              className="sr1-new-btn"
+              onClick={() => setShowPanel(true)}
+            >
+              <Plus size={14} />
+              New enquiry
+            </button>
+          )}
+        </div>
+
+        <div className="sr1-card-list">
+          {loading
+            ? Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)
+            : scenarios.map((s) => (
+                <RequestCard
+                  key={s.scenario_id}
+                  scenario={s}
+                  onClick={() => onSelect(s)}
+                />
+              ))}
+        </div>
       </div>
 
-      <div className="sr1-card-list">
-        {loading
-          ? Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)
-          : scenarios.map((s) => (
-              <RequestCard
-                key={s.scenario_id}
-                scenario={s}
-                onClick={() => onSelect(s)}
-              />
-            ))}
-      </div>
+      {/* Right: create panel */}
+      {showPanel && (
+        <CreateEnquiryPanel
+          onClose={() => setShowPanel(false)}
+          onSubmit={(payload) => {
+            onEnquirySubmit?.(payload);
+          }}
+        />
+      )}
     </div>
   );
 }
