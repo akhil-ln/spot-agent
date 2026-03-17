@@ -17,10 +17,13 @@ from app.services.benchmark import get_benchmark_rate, compute_demand_index
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-# ── Path to demo scenarios JSON ───────────────────────────────────────────────
-_SCENARIOS_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "..", "..", "data", "demo_scenarios.json"
-)
+# # ── Path to demo scenarios JSON ───────────────────────────────────────────────
+# _SCENARIOS_PATH = os.path.join(
+#     os.path.dirname(__file__), "..", "..", "..", "data", "demo_scenarios.json"
+# )
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+_SCENARIOS_PATH = os.path.join(BASE_DIR, "data", "demo_scenarios.json")
 
 
 # ── Existing endpoints (keep for direct use / testing) ───────────────────────

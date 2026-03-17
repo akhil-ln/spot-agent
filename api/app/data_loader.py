@@ -12,9 +12,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 # ── Paths ───────────────────────────────────────────────────────────────────
-_BASE = os.path.join(os.path.dirname(__file__), "..", "..", "data")
-_LANE_PATH = os.path.join(_BASE, "lane_stats.json")
-_LSP_PATH  = os.path.join(_BASE, "lsp_profiles.json")
+# _BASE = os.path.join(os.path.dirname(__file__), "..", "..", "data")
+# _LANE_PATH = os.path.join(_BASE, "lane_stats.json")
+# _LSP_PATH  = os.path.join(_BASE, "lsp_profiles.json")
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+_LANE_PATH = os.path.join(BASE_DIR, "data", "lane_stats.json")
+_LSP_PATH  = os.path.join(BASE_DIR, "data", "lsp_profiles.json")
 
 # ── Load JSON files at startup ───────────────────────────────────────────────
 def _load(path: str, label: str) -> dict:
