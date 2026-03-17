@@ -1,459 +1,184 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { analyseQuotes } from "../api/index";
 
-const DARK = "#0E0C22";
-const MID  = "#1C193A";
+const STEPS = [
+  { label: "Enriching quotes with market intelligence…", icon: "📊" },
+  { label: "Scoring transporters across 5 dimensions…", icon: "⚙️" },
+  { label: "Running lane benchmark analysis…",           icon: "🛣️" },
+  { label: "Generating recommendation…",                 icon: "🤖" },
+];
 
-const S = {
-  page: {
-    minHeight: "100vh",
-    background: `
-      radial-gradient(circle at 20% 20%, rgba(123,118,212,0.18), transparent 40%),
-      radial-gradient(circle at 80% 70%, rgba(57,49,133,0.25), transparent 45%),
-      #0E0C22
-    `,
-    color: "#FFFFFF",
-    display: "flex",
-    flexDirection: "column",
-  },
+export default function Screen3({ scenario, onComplete, onBack }) {
+  const [activeStep, setActiveStep] = useState(0);
+  const [error, setError]           = useState(null);
+  const called = useRef(false);
 
-  nav: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 48px",
-    height: 60,
-    borderBottom: "1px solid rgba(255,255,255,0.08)",
-    backdropFilter: "blur(12px)",
-    background: "rgba(14,12,34,0.6)",
-    position: "sticky",
-    top: 0,
-    zIndex: 10,
-  },
+  /* Animate through the visual steps while API runs */
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev < STEPS.length - 1 ? prev + 1 : prev));
+    }, 2200);
+    return () => clearInterval(interval);
+  }, []);
 
-  logoMark: {
-    width: 28,
-    height: 28,
-    background: "linear-gradient(135deg,#7B76D4,#5B54E8)",
-    borderRadius: 6,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: 700,
-    boxShadow: "0 4px 10px rgba(91,84,232,0.5)"
-  },
+  /* Fire the analysis API once */
+  useEffect(() => {
+    if (called.current) return;
+    called.current = true;
 
-  logoText: {
-    fontSize: 15,
-    fontWeight: 700,
-    color: "#fff",
-    letterSpacing: "-0.3px",
-  },
+    analyseQuotes(scenario.spot_request, scenario.quotes)
+      .then((res) => {
+        /* small delay so the last animation step is visible */
+        setTimeout(() => onComplete(res.data), 600);
+      })
+      .catch((err) => {
+        console.error("Analysis failed:", err);
+        setError(err?.response?.data?.detail || err.message || "Analysis failed. Please try again.");
+      });
+  }, [scenario, onComplete]);
 
-  navCta: {
-    background: "linear-gradient(135deg,#7B76D4,#5B54E8)",
-    color: "#fff",
-    border: "none",
-    padding: "8px 20px",
-    borderRadius: "var(--radius)",
-    fontSize: 13,
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all .25s ease",
-    boxShadow: "0 10px 25px rgba(91,84,232,0.35)"
-  },
+  const req = scenario.spot_request;
 
-  hero: {
-    flex: 1,
-    display: "flex",
-    alignItems: "center",
-    padding: "80px 48px 60px",
-    gap: 64,
-    maxWidth: 1200,
-    margin: "0 auto",
-    width: "100%",
-  },
-
-  heroLeft: {
-    flex: "0 0 520px",
-  },
-
-  eyebrow: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 6,
-    background: "rgba(57,49,133,0.25)",
-    border: "1px solid rgba(57,49,133,0.5)",
-    borderRadius: 4,
-    padding: "4px 12px",
-    fontSize: 11,
-    fontWeight: 600,
-    color: "#a8a3e8",
-    letterSpacing: "0.8px",
-    textTransform: "uppercase",
-    marginBottom: 24,
-    backdropFilter:"blur(6px)"
-  },
-
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: "50%",
-    background: "#7B76D4",
-    animation: "pulse 2s ease-in-out infinite",
-  },
-
-  h1: {
-    fontSize: 44,
-    fontWeight: 800,
-    lineHeight: 1.1,
-    letterSpacing: "-1.5px",
-    marginBottom: 20,
-    color: "#FFFFFF",
-  },
-
-  h1Accent: {
-    background: "linear-gradient(90deg,#7B76D4,#A78BFA)",
-    WebkitBackgroundClip: "text",
-    color: "transparent",
-  },
-
-  subline: {
-    fontSize: 16,
-    lineHeight: 1.7,
-    color: "rgba(255,255,255,0.55)",
-    marginBottom: 36,
-    maxWidth: 440,
-  },
-
-  ctaRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 16,
-  },
-
-  ctaPrimary: {
-    background: "linear-gradient(135deg,#7B76D4,#5B54E8)",
-    color: "#fff",
-    border: "none",
-    padding: "12px 28px",
-    borderRadius: "var(--radius)",
-    fontSize: 14,
-    fontWeight: 600,
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    transition: "all .25s ease",
-    boxShadow: "0 10px 25px rgba(91,84,232,0.35)"
-  },
-
-  ctaArrow: {
-    fontSize: 16,
-    transition: "transform var(--transition)",
-  },
-
-  ctaSecondary: {
-    background: "transparent",
-    color: "rgba(255,255,255,0.5)",
-    border: "none",
-    padding: "12px 0",
-    fontSize: 14,
-    fontWeight: 500,
-    cursor: "pointer",
-  },
-
-  heroRight: {
-    flex: 1,
-    position: "relative",
-    display:"flex",
-    alignItems:"center",
-    justifyContent:"center"
-  },
-
-  statsRow: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: 1,
-    background: "rgba(255,255,255,0.06)",
-    borderRadius: "var(--radius-md)",
-    padding: 1,
-    border: "1px solid rgba(255,255,255,0.08)",
-    marginBottom: 48,
-  },
-
-  statCell: {
-    background: "linear-gradient(160deg,#1C193A,#161333)",
-    padding: "22px 24px",
-    textAlign: "center",
-    transition: "all .25s ease",
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
-  },
-
-  statNum: {
-    fontSize: 28,
-    fontWeight: 800,
-    color: "#fff",
-    letterSpacing: "-1px",
-    marginBottom: 4,
-  },
-
-  statLabel: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.4)",
-    lineHeight: 1.4,
-  },
-
-  howSection: {
-    padding: "0 48px 80px",
-    maxWidth: 1200,
-    margin: "0 auto",
-    width: "100%",
-  },
-
-  howLabel: {
-    fontSize: 11,
-    fontWeight: 600,
-    color: "rgba(255,255,255,0.3)",
-    letterSpacing: "1.5px",
-    textTransform: "uppercase",
-    marginBottom: 24,
-  },
-
-  steps: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
-    gap: 2,
-  },
-
-  step: {
-    background: "linear-gradient(160deg,#1C193A,#17143A)",
-    padding: "24px 20px",
-    borderRadius: "var(--radius)",
-    border: "1px solid rgba(255,255,255,0.07)",
-    position: "relative",
-    overflow: "hidden",
-    transition: "all .25s ease",
-    boxShadow: "0 15px 35px rgba(0,0,0,0.5)",
-  },
-
-  stepNum: {
-    fontSize: 36,
-    fontWeight: 800,
-    color: "rgba(57,49,133,0.4)",
-    lineHeight: 1,
-    marginBottom: 12,
-    letterSpacing: "-2px",
-  },
-
-  stepTitle: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: "#fff",
-    marginBottom: 6,
-  },
-
-  stepDesc: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.38)",
-    lineHeight: 1.6,
-  },
-};
-
-
-function PreviewCard() {
   return (
     <div style={{
-      background: "linear-gradient(160deg,#1C193A,#161333)",
-      border: "1px solid rgba(255,255,255,0.12)",
-      borderRadius: "var(--radius-md)",
-      padding: 20,
-      fontSize: 12,
-      boxShadow: "0 30px 60px rgba(0,0,0,0.6)",
-      backdropFilter: "blur(8px)"
+      maxWidth: 700,
+      margin: "0 auto",
+      padding: "80px 32px 60px",
+      textAlign: "center",
+      animation: "fadeUp 0.35s ease both",
     }}>
-      
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <div>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", display: "block", marginBottom: 2 }}>
-            SPOT REQUEST · SR-001
-          </span>
-          <span style={{ fontWeight: 600, color: "#fff", fontSize: 13 }}>
-            Fazilka, Punjab → Alwar, Rajasthan
-          </span>
-        </div>
 
-        <span style={{
-          background: "#DC2626",
-          color: "#fff",
-          fontSize: 10,
-          fontWeight: 700,
-          padding: "3px 8px",
-          borderRadius: 3
-        }}>
-          HIGH
-        </span>
+      {/* ── Header ── */}
+      <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 600, color: "var(--text-muted)", letterSpacing: "0.5px", textTransform: "uppercase" }}>
+        {req.id}
       </div>
+      <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.5px", marginBottom: 6 }}>
+        {req.origin} → {req.destination}
+      </h2>
+      <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 48 }}>
+        Evaluating {scenario.quotes?.length || 0} quotes against market benchmarks
+      </p>
 
+      {/* ── Spinner ── */}
+      <div style={{
+        width: 72,
+        height: 72,
+        margin: "0 auto 48px",
+        borderRadius: "50%",
+        border: "3px solid var(--border)",
+        borderTopColor: "var(--primary)",
+        animation: "spin 0.8s linear infinite",
+      }} />
+
+      {/* ── Step list ── */}
       <div style={{
         display: "flex",
-        gap: 16,
-        marginBottom: 16,
-        color: "rgba(255,255,255,0.4)",
-        fontSize: 11
+        flexDirection: "column",
+        gap: 12,
+        maxWidth: 400,
+        margin: "0 auto 48px",
+        textAlign: "left",
       }}>
-        <span>15 MT OPENBODY</span>
-        <span>·</span>
-        <span>Threshold: ₹45,000</span>
-        <span>·</span>
-        <span>4 quotes received</span>
-      </div>
-
-      {[
-        { lsp: "Atharv Logistics", rate: "38,500", delta: "−14%", ok: true },
-        { lsp: "Shree Ram Transport", rate: "41,000", delta: "−8%", ok: true },
-        { lsp: "FastMove Carriers", rate: "51,000", delta: "+13%", ok: false },
-      ].map((q, i) => (
-        <div key={i} style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "8px 0",
-          borderTop: "1px solid rgba(255,255,255,0.06)"
-        }}>
-          <span style={{ color: "rgba(255,255,255,0.6)" }}>{q.lsp}</span>
-
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span style={{ color: "#fff", fontWeight: 600 }}>₹{q.rate}</span>
-            <span style={{
-              fontSize: 10,
-              color: q.ok ? "#4ADE80" : "#F87171",
-              fontWeight: 600
-            }}>
-              {q.delta}
-            </span>
-          </div>
-        </div>
-      ))}
-
-      <div style={{
-        marginTop: 16,
-        background: "linear-gradient(135deg,rgba(57,49,133,0.35),rgba(91,84,232,0.25))",
-        border: "1px solid rgba(57,49,133,0.5)",
-        borderRadius: "var(--radius-sm)",
-        padding: "10px 14px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        boxShadow: "0 0 25px rgba(91,84,232,0.35)"
-      }}>
-        <span style={{ color: "#a8a3e8", fontSize: 11, fontWeight: 600 }}>
-          AI RECOMMENDATION
-        </span>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div style={{
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            background: "#22c55e",
-            animation: "pulse 1.5s ease-in-out infinite"
-          }} />
-          <span style={{ color: "#fff", fontWeight: 700, fontSize: 13 }}>
-            ACCEPT · 91% confidence
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-
-export default function Landing({ onEnter }) {
-
-  return (
-    <div style={S.page}>
-
-      <nav style={S.nav}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={S.logoMark}>L</div>
-          <span style={S.logoText}>LoRRI</span>
-        </div>
-
-        <button
-          style={S.navCta}
-          onClick={onEnter}
-          onMouseEnter={e => e.target.style.transform = "translateY(-2px)"}
-          onMouseLeave={e => e.target.style.transform = "translateY(0)"}
-        >
-          Open LoRRI Spot →
-        </button>
-      </nav>
-
-
-      <section style={S.hero}>
-        <div style={S.heroLeft}>
-
-          <div style={S.eyebrow}>
-            <div style={S.dot}/>
-            LoRRI Spot · Decision Agent
-          </div>
-
-          <h1 style={S.h1}>
-            Stop guessing.<br/>
-            <span style={S.h1Accent}>Start deciding.</span>
-          </h1>
-
-          <p style={S.subline}>
-            Your procurement team evaluates 5 freight quotes manually — cross-referencing rates,
-            calling LSPs, and guessing on reliability. LoRRI Spot replaces hours of judgment with
-            a 5-second AI recommendation.
-          </p>
-
-          <div style={S.ctaRow}>
-
-            <button
-              style={S.ctaPrimary}
-              onClick={onEnter}
-              onMouseEnter={e => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = "0 16px 40px rgba(91,84,232,0.45)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 10px 25px rgba(91,84,232,0.35)";
+        {STEPS.map((step, i) => {
+          const done    = i < activeStep;
+          const current = i === activeStep;
+          return (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "12px 16px",
+                borderRadius: "var(--radius)",
+                background: current ? "var(--primary-dim, rgba(57,49,133,0.08))" : "var(--surface)",
+                border: `1px solid ${current ? "var(--primary)" : "var(--border)"}`,
+                opacity: done ? 0.45 : 1,
+                transition: "all 0.35s ease",
               }}
             >
-              View Open Spot Requests
-              <span style={S.ctaArrow}>→</span>
-            </button>
+              <span style={{ fontSize: 16 }}>{done ? "✓" : step.icon}</span>
+              <span style={{
+                fontSize: 13,
+                fontWeight: current ? 600 : 400,
+                color: current ? "var(--text-primary)" : "var(--text-secondary)",
+              }}>
+                {step.label}
+              </span>
+              {current && (
+                <span style={{
+                  marginLeft: "auto",
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: "var(--primary)",
+                  animation: "pulse 1.5s ease-in-out infinite",
+                }} />
+              )}
+            </div>
+          );
+        })}
+      </div>
 
-            <button style={S.ctaSecondary}>
-              How it works ↓
-            </button>
-
+      {/* ── Error state ── */}
+      {error && (
+        <div style={{
+          background: "var(--red-bg, #FEF2F2)",
+          border: "1px solid var(--red-border, #FCA5A5)",
+          borderRadius: "var(--radius)",
+          padding: "16px 20px",
+          marginBottom: 24,
+          textAlign: "left",
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--red, #DC2626)", marginBottom: 4 }}>
+            Analysis failed
           </div>
-
+          <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{error}</div>
+          <div style={{ marginTop: 14, display: "flex", gap: 10 }}>
+            <button
+              onClick={() => {
+                setError(null);
+                setActiveStep(0);
+                called.current = false;
+              }}
+              style={{
+                background: "var(--primary)",
+                color: "#fff",
+                border: "none",
+                padding: "8px 20px",
+                borderRadius: "var(--radius)",
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Retry
+            </button>
+            <button
+              onClick={onBack}
+              style={{
+                background: "none",
+                border: "1px solid var(--border)",
+                color: "var(--text-secondary)",
+                padding: "8px 20px",
+                borderRadius: "var(--radius)",
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: "pointer",
+              }}
+            >
+              ← Back
+            </button>
+          </div>
         </div>
+      )}
 
-
-        <div style={S.heroRight}>
-
-          <div style={{
-            position:"absolute",
-            width:400,
-            height:400,
-            background:"radial-gradient(circle,#7B76D455,transparent 70%)",
-            filter:"blur(80px)"
-          }}/>
-
-          <PreviewCard/>
-
-        </div>
-      </section>
-
+      {/* ── CSS Keyframes (inline) ── */}
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
