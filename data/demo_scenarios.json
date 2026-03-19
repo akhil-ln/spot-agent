@@ -22,7 +22,7 @@
       "additional_details": "Fragile FMCG goods, needs careful handling"
     },
     "lane_context": {
-      "predicted_rate": 39800,
+      "predicted_rate": 45267,
       "benchmark_rate": 40500,
       "lane_avg_historical": 41200,
       "lane_min_historical": 34000,

@@ -125,7 +125,7 @@ function SkeletonCard() {
 }
 
 export default function Screen1({ scenarios, loading, onSelect, onEnquirySubmit }) {
-  const [showPanel, setShowPanel] = useState(true);
+  const [showPanel, setShowPanel] = useState(false);
 
   return (
     <div className="sr1-page">

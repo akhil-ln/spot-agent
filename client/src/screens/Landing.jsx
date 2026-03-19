@@ -194,7 +194,7 @@ export default function Landing({ onEnter }) {
             {
               n: "01",
               title: "Transporters Quote",
-              desc: "LSPs submit freight rates for your open spot request. Your team sees raw prices — no reliability context.",
+              desc: "LSPs submit freight rates for your open spot request. Your team sees raw prices - no reliability context.",
             },
             {
               n: "02",
