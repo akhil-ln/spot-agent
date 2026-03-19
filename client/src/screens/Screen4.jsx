@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   CheckCircle2, Truck, MapPin, Package, AlertTriangle,
   ChevronDown, ChevronUp, ArrowRight, RotateCcw,
   TrendingUp, TrendingDown, Route, Brain,
 } from "lucide-react";
 import ActionModal from "../components/ActionModal";
-import { deriveSignals, adjustedConfidence, loadDecisions } from "../utils/feedbackStore";
+import { fetchSignals, loadDecisions, adjustedConfidence } from "../utils/feedbackStore";
 
 /* ─── Rec config ──────────────────────────────────────────── */
 const REC = {
@@ -415,10 +415,16 @@ export default function Screen4({ scenario, result, onRerun, onBack }) {
   );
   const req = scenario?.spot_request || {};
 
-  /* ── Derive RL signals from past decisions ── */
-  const signals     = useMemo(() => deriveSignals(scenario, baseRec), [scenario, baseRec]);
-  const adjConf     = useMemo(() => adjustedConfidence(baseRec.confidence, signals), [baseRec.confidence, signals]);
-  const decisionCount = useMemo(() => loadDecisions().length, []);
+  /* ── Fetch RL signals (async, backend-first) ── */
+  const [rlData, setRlData] = useState({ signals: [], adjusted_confidence: null, decision_count: 0 });
+
+  useEffect(() => {
+    fetchSignals(scenario, baseRec).then(setRlData).catch(() => {});
+  }, [scenario, baseRec]);
+
+  const signals     = rlData.signals;
+  const adjConf     = rlData.adjusted_confidence ?? baseRec.confidence;
+  const decisionCount = rlData.decision_count;
 
 
   /* ── Build effective recommendation (base or override) ── */

@@ -26,10 +26,11 @@ app.add_middleware(
 
 from app.routes.health import router as health_router
 from app.routes.analyse import router as analyse_router
+from app.routes.feedback import router as feedback_router
 
-# Apply prefix conditionally
-app.include_router(health_router, prefix=API_PREFIX)
-app.include_router(analyse_router, prefix=API_PREFIX)
+app.include_router(health_router,   prefix=API_PREFIX)
+app.include_router(analyse_router,  prefix=API_PREFIX)
+app.include_router(feedback_router, prefix=API_PREFIX)
 
 @app.get(f"{API_PREFIX}/")
 def home():

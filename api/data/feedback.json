@@ -1,0 +1,20 @@
+[
+  {
+    "id": "D4859ADD1",
+    "timestamp": "2026-03-19T19:20:01.365612Z",
+    "action": "NEGOTIATE",
+    "lsp": "Eastern Carriers",
+    "awarded_rate": null,
+    "target_price": 31000.0,
+    "neg_gap_pct": 8.823529411764707,
+    "quoted_rate": 34000.0,
+    "origin": "Kolkata, West Bengal",
+    "destination": "Patna, Bihar",
+    "truck_type": "15 MT OPENBODY",
+    "urgency": "LOW",
+    "spot_id": "SPOT-003",
+    "ai_recommendation": "NEGOTIATE",
+    "overridden": true,
+    "note": "asdasdas"
+  }
+]
