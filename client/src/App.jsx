@@ -5,6 +5,7 @@ import Screen1 from "./screens/Screen1";
 import Screen2 from "./screens/Screen2";
 import Screen3 from "./screens/Screen3";
 import Screen4 from "./screens/Screen4";
+import HistoryScreen from "./screens/HistoryScreen";
 import { getScenarios } from "./api/index";
 import "./index.css";
 
@@ -15,6 +16,7 @@ import "./index.css";
     2 – Spot Detail + Quotes (Screen2)
     3 – AI Analysis Loader   (Screen3)
     4 – Recommendation       (Screen4)
+    5 – Decision History     (HistoryScreen)
 */
 
 export default function App() {
@@ -72,6 +74,7 @@ export default function App() {
         selectedScenario={selectedScenario}
         onLogoClick={() => goTo(0)}
         onSpotListClick={() => goTo(1)}
+        onHistoryClick={() => goTo(5)}
       />
 
       <main style={{ flex: 1 }}>
@@ -103,6 +106,9 @@ export default function App() {
             onRerun={handleRerun}
             onBack={() => goTo(1)}
           />
+        )}
+        {page === 5 && (
+          <HistoryScreen onBack={() => goTo(1)} />
         )}
       </main>
     </div>

@@ -4,6 +4,7 @@ import logging
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from tenacity import retry, wait_fixed, stop_after_attempt
 from app.config import settings
 from app.models import RequestMeta, ScoredQuote, AIRecommendation
 
@@ -50,7 +51,7 @@ def _build_quotes_text(quotes: list[ScoredQuote]) -> str:
     lines = []
     for i, q in enumerate(quotes):
         flags = []
-        if q.availability_flag: flags.append(f"⚠️ {q.availability_flag}")
+        if q.availability_flag: flags.append(f"[WARN] {q.availability_flag}")
         if q.is_new_lsp:        flags.append("NEW LSP — no history")
         flag_str = f"  [{', '.join(flags)}]" if flags else ""
 
@@ -65,16 +66,30 @@ def _build_quotes_text(quotes: list[ScoredQuote]) -> str:
     return "\n\n".join(lines)
 
 
+_FALLBACK_RISK = "Gemini unavailable. Verify this recommendation manually before acting."
+
+
 def _fallback(quotes: list[ScoredQuote], threshold: float) -> tuple[dict, bool]:
     top = quotes[0]
     if top.composite >= 80:
+        if top.is_new_lsp:
+            # New LSP with no track record: cap at NEGOTIATE even with a high score
+            target = round(top.raw_quote * (1 - top.lsp_neg_gap_pct / 100))
+            return {
+                "recommendation": "NEGOTIATE",
+                "target_lsp": top.lsp,
+                "confidence": round(top.composite / 100, 2),
+                "negotiate_target_price": target,
+                "reasoning": f"{top.lsp} scores {top.composite}/100 but has no history. Negotiating before committing.",
+                "key_risk": f"New LSP — no track record. {_FALLBACK_RISK}"
+            }, True
         return {
             "recommendation": "ACCEPT",
             "target_lsp": top.lsp,
             "confidence": round(top.composite / 100, 2),
             "negotiate_target_price": None,
             "reasoning": f"{top.lsp} scores {top.composite}/100 — recommended by scoring engine.",
-            "key_risk": "Gemini unavailable. Verify this recommendation manually before acting."
+            "key_risk": _FALLBACK_RISK
         }, True
     if top.composite >= 55:
         target = round(top.raw_quote * (1 - top.lsp_neg_gap_pct / 100))
@@ -84,7 +99,7 @@ def _fallback(quotes: list[ScoredQuote], threshold: float) -> tuple[dict, bool]:
             "confidence": round(top.composite / 100, 2),
             "negotiate_target_price": target,
             "reasoning": f"{top.lsp} scores {top.composite}/100. Target price from {top.lsp_neg_gap_pct}% historical gap.",
-            "key_risk": "Gemini unavailable. Verify this recommendation manually before acting."
+            "key_risk": _FALLBACK_RISK
         }, True
     return {
         "recommendation": "REJECT",
@@ -92,7 +107,7 @@ def _fallback(quotes: list[ScoredQuote], threshold: float) -> tuple[dict, bool]:
         "confidence": 0.5,
         "negotiate_target_price": None,
         "reasoning": "All quotes score below 55. Re-tendering recommended.",
-        "key_risk": "Gemini unavailable. Verify this recommendation manually before acting."
+        "key_risk": _FALLBACK_RISK
     }, True
 
 
@@ -107,9 +122,16 @@ def _get_chain():
             temperature=0,
             max_output_tokens=2048,
             response_mime_type="application/json",
+            request_timeout=15,  # Gemini minimum is 10s; 15s gives headroom before fallback
         )
         _chain = PROMPT | llm | StrOutputParser()
     return _chain
+
+
+@retry(wait=wait_fixed(1), stop=stop_after_attempt(2), reraise=True)
+def _call_gemini(invocation_kwargs: dict) -> str:
+    """Invoke the Gemini chain with 1 retry on transient failure before falling back."""
+    return _get_chain().invoke(invocation_kwargs)
 
 
 def get_recommendation(
@@ -120,7 +142,7 @@ def get_recommendation(
     quotes_text = _build_quotes_text(ranked_quotes)
 
     try:
-        raw = _get_chain().invoke({
+        raw = _call_gemini({
             "origin":         meta.origin,
             "destination":    meta.destination,
             "truck_type":     meta.truck_type,
@@ -139,10 +161,11 @@ def get_recommendation(
         try:
             parsed = json.loads(cleaned)
         except json.JSONDecodeError:
-            match = re.search(r"\{.*\}", cleaned, re.DOTALL)
-            if not match:
-                raise ValueError("No JSON in Gemini response")
-            parsed = json.loads(match.group())
+            # Strip any leading/trailing non-JSON text and try again
+            start, end = cleaned.find('{'), cleaned.rfind('}')
+            if start == -1 or end == -1 or start >= end:
+                raise ValueError("No JSON object found in Gemini response")
+            parsed = json.loads(cleaned[start:end + 1])
 
         return AIRecommendation(**parsed), False
 

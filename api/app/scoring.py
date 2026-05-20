@@ -1,16 +1,11 @@
 from app.models import QuoteInput, RequestMeta, ScoredQuote, DimensionScores
-
-WEIGHTS = {
-    "price":       0.30,
-    "reliability": 0.25,
-    "urgency":     0.20,
-    "market":      0.15,
-    "threshold":   0.10,
-}
+from app.config import SCORING_WEIGHTS as WEIGHTS
 
 
 def _score_price(raw: float, predicted: float, benchmark: float) -> float:
     fair = 0.6 * predicted + 0.4 * benchmark
+    if fair <= 0:
+        return 50
     delta = ((raw - fair) / fair) * 100
     if delta <= -10: return 100
     if delta <= 0:   return 90
@@ -27,17 +22,21 @@ def _score_reliability(win_rate: float, otd: float, damage: float) -> float:
 
 def _score_urgency(urgency: str, transit_days: int, min_transit: int) -> float:
     gap = transit_days - min_transit
-    if urgency == "HIGH":   return max(20, 100 - gap * 25)
-    if urgency == "MEDIUM": return max(40, 85  - gap * 15)
+    if urgency == "HIGH":   return max(10, 100 - gap * 25)
+    if urgency == "MEDIUM": return max(20, 85  - gap * 15)
     return 70
 
 
 def _score_market(raw: float, benchmark: float, demand_index: float) -> float:
-    if demand_index >= 0.85: return 65
-    delta = (raw - benchmark) / benchmark
-    if delta < -0.10: return 90
-    if delta < 0:     return 80
-    if delta < 0.05:  return 70
+    if benchmark <= 0:
+        return 60
+    delta_pct = ((raw - benchmark) / benchmark) * 100
+    if demand_index >= 0.85:
+        # High-demand lane: apply a modest floor but still reward quotes that beat the market
+        return max(55, 65 - max(0, delta_pct * 0.5))
+    if delta_pct < -10: return 90
+    if delta_pct < 0:   return 80
+    if delta_pct < 5:   return 70
     return 55
 
 

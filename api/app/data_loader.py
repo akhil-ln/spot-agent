@@ -7,6 +7,7 @@ Provides two pure-lookup functions used by the analyse orchestrator.
 
 import os
 import json
+import math
 import logging
 
 logger = logging.getLogger(__name__)
@@ -31,8 +32,10 @@ def _load(path: str, label: str) -> dict:
         logger.error(f"Failed to load {label}: {e}")
         return {}
 
-_lane_stats:   dict = _load(_LANE_PATH, "lane_stats")
-_lsp_profiles: dict = _load(_LSP_PATH,  "lsp_profiles")
+_lsp_profiles: dict = _load(_LSP_PATH, "lsp_profiles")
+
+# Normalize lane stat keys to lowercase at load time so lookups are case-insensitive
+_lane_stats: dict = {k.lower(): v for k, v in _load(_LANE_PATH, "lane_stats").items()}
 
 # ── National fallback constants ──────────────────────────────────────────────
 _NATIONAL_DEFAULT = {
@@ -44,7 +47,7 @@ _NATIONAL_DEFAULT = {
 }
 
 _NEW_LSP_DEFAULT = {
-    "win_rate":             0.50,
+    "win_rate":             0.35,  # conservative — unknown LSP should earn trust
     "neg_gap_pct":          8.0,
     "lane_count":           0,
     "odt_lane_count":       0,
@@ -94,17 +97,19 @@ def get_lsp_profile(lsp_name: str) -> dict:
         }
 
     # Derived fields
-    base["win_rate_pct"]           = round(base["win_rate"] * 100, 1)
-    base["on_time_delivery_pct"]   = round(base["win_rate"] * 100, 1)  # proxy
-    base["damage_rate_pct"]        = 2.0                                # neutral default
-    base["lane_familiarity_score"] = min(100, base["lane_count"] * 2)
+    base["win_rate_pct"]         = round(base["win_rate"] * 100, 1)
+    base["on_time_delivery_pct"] = round(base["win_rate"] * 100, 1)  # proxy
+    # New LSPs get a more conservative damage assumption; known LSPs default to industry avg
+    base["damage_rate_pct"]      = 3.5 if base["is_new_lsp"] else 2.0
+    # Log curve: 1 trip→9, 10→30, 100→60, 1000→90 — more realistic than linear
+    base["lane_familiarity_score"] = min(100, round(30 * math.log10(base["lane_count"] + 1), 1))
 
     return base
 
 
 # ── Lane Stats lookup ────────────────────────────────────────────────────────
 def _lane_key(origin: str, destination: str, truck_type: str) -> str:
-    return f"{origin.strip()}|{destination.strip()}|{truck_type.strip()}"
+    return f"{origin.strip().lower()}|{destination.strip().lower()}|{truck_type.strip().lower()}"
 
 
 def get_lane_context(origin: str, destination: str, truck_type: str) -> dict:

@@ -406,7 +406,7 @@ export default function Screen4({ scenario, result, onRerun, onBack }) {
   const [showOverride,   setShowOverride]  = useState(false);
   const [overrideData,   setOverrideData]  = useState(null);  // { action, lsp, target_price, reason }
   const [toast,          setToast]         = useState(null);
-  const [, forceUpdate] = useState(0);   // re-render after decisions saved
+  const [signalVersion,  setSignalVersion] = useState(0);  // increment to re-fetch signals after a confirmed decision
 
   const { ranked_quotes = [], recommendation, lane_context = {}, used_fallback } = result;
   const baseRec = useMemo(
@@ -420,7 +420,7 @@ export default function Screen4({ scenario, result, onRerun, onBack }) {
 
   useEffect(() => {
     fetchSignals(scenario, baseRec).then(setRlData).catch(() => {});
-  }, [scenario, baseRec]);
+  }, [scenario, baseRec, signalVersion]);
 
   const signals     = rlData.signals;
   const adjConf     = rlData.adjusted_confidence ?? baseRec.confidence;
@@ -444,7 +444,7 @@ export default function Screen4({ scenario, result, onRerun, onBack }) {
 
   function handleConfirm(payload) {
     setModalOpen(false);
-    forceUpdate(n => n + 1); // re-derive signals after save
+    setSignalVersion(v => v + 1); // re-fetch RL signals to reflect the confirmed decision
     const msgs = {
       ACCEPT:    `Award confirmed: ${payload.lsp}${rec.overridden ? " (Override)" : ""}`,
       NEGOTIATE: `Counter sent to ${payload.lsp} at ${fINR(payload.target_price)}`,

@@ -33,10 +33,12 @@ def get_predicted_rate(
     if key in _cache:
         return _cache[key]
 
-    # ── External API call placeholder ───────────────────────────────────────
-    # When the real Rate Prediction endpoint is available, replace this block:
+    # ── TODO [PRODUCTION]: Wire real Rate Prediction API ────────────────────
+    # Set env var: RATE_PREDICTION_URL=https://your-api/predict
+    # Expected POST body:  { origin, destination, truck_type, date }
+    # Expected response:   { "predicted_rate": <float INR>, "confidence": <0-1>, "model_version": <str> }
     #
-    # import httpx, os
+    # import httpx
     # try:
     #     resp = httpx.post(
     #         os.getenv("RATE_PREDICTION_URL", ""),

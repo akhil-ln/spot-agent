@@ -33,10 +33,13 @@ def get_benchmark_rate(
     if key in _cache:
         return _cache[key]
 
-    # ── External API call placeholder ───────────────────────────────────────
-    # When the real Benchmarking Tool endpoint is available, replace this block:
+    # ── TODO [PRODUCTION]: Wire real Benchmarking API ───────────────────────
+    # Set env var: BENCHMARK_URL=https://your-api/benchmark
+    # Expected POST body:  { origin, destination, truck_type }
+    # Expected response:   { "avg_rate": <float>, "min_rate": <float>, "max_rate": <float>,
+    #                         "std_dev": <float>, "sample_size": <int> }
     #
-    # import httpx, os
+    # import httpx
     # try:
     #     resp = httpx.post(
     #         os.getenv("BENCHMARK_URL", ""),
@@ -45,7 +48,7 @@ def get_benchmark_rate(
     #         timeout=3.0,
     #     )
     #     resp.raise_for_status()
-    #     result = resp.json()   # { avg_rate, min_rate, max_rate, std_dev, sample_size }
+    #     result = resp.json()
     #     normalised = {
     #         "avg":     result["avg_rate"],
     #         "min":     result["min_rate"],

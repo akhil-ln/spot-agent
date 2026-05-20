@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Topbar({ page, selectedScenario, onLogoClick, onSpotListClick }) {
+export default function Topbar({ page, selectedScenario, onLogoClick, onSpotListClick, onHistoryClick }) {
   const req = selectedScenario?.spot_request;
 
   return (
@@ -106,7 +106,7 @@ export default function Topbar({ page, selectedScenario, onLogoClick, onSpotList
           )}
         </div>
 
-        {/* Right: live context pill */}
+        {/* Right: History link + live context pill */}
         {page >= 1 && (
           <div style={{
             display: "flex",
@@ -115,6 +115,22 @@ export default function Topbar({ page, selectedScenario, onLogoClick, onSpotList
             fontSize: 12,
             color: "var(--text-muted)",
           }}>
+            <button
+              onClick={onHistoryClick}
+              style={{
+                background: page === 5 ? "var(--primary-dim)" : "transparent",
+                color: page === 5 ? "var(--primary)" : "var(--text-muted)",
+                border: `1px solid ${page === 5 ? "var(--primary-border)" : "var(--border)"}`,
+                borderRadius: "var(--radius-sm)",
+                padding: "4px 12px",
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all var(--transition)",
+              }}
+            >
+              History
+            </button>
             {page === 2 && (
               <span style={{
                 background: "var(--amber-bg)",

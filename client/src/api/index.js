@@ -36,6 +36,10 @@ export const getSignals = (ctx) =>
 export const getFeedbackSummary = () =>
   api.get("/feedback/summary", { timeout: 5000 });
 
+/** List recent decisions (default 50, max 500). */
+export const getFeedbackHistory = (limit = 50) =>
+  api.get(`/feedback?limit=${limit}`, { timeout: 5000 });
+
 /** Clear all decisions — for demo resets. */
 export const clearFeedback = () =>
   api.delete("/feedback", { timeout: 5000 });

@@ -6,7 +6,7 @@ Storage: api/data/feedback.json  (simple flat list, capped at 500 entries)
 This is intentionally a lightweight POC — for production you'd swap the file
 store for a proper DB and train an actual model.
 """
-import json, os, uuid, logging
+import json, os, uuid, logging, threading
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
@@ -14,6 +14,21 @@ log = logging.getLogger(__name__)
 
 FEEDBACK_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "feedback.json")
 MAX_RECORDS   = 500
+
+# Module-level lock: prevents concurrent requests from corrupting the JSON file
+# during simultaneous read-modify-write cycles (sufficient for single-process uvicorn)
+_store_lock = threading.Lock()
+
+# ─── SYNC CONTRACT with client/src/utils/feedbackStore.js ─────────────────────
+# The JS offline fallback (deriveSignalsLocal) mirrors derive_signals() below.
+# When changing signal logic here, update the JS counterpart to stay in sync:
+#   • LSP accept rate threshold: 0.70
+#   • LSP accept adj cap: min(0.08, 0.02 × total)
+#   • LSP reject adj cap: min(0.10, 0.02 × rejects)
+#   • Lane adj: 0.03 if count ≥ 3, else 0.01 (negated when >50% rejections)
+#   • Override adj: min(0.03, 0.005 × override_count)
+#   • Confidence clamp: [0.10, 0.99]
+# ──────────────────────────────────────────────────────────────────────────────
 
 
 # ─── Storage ──────────────────────────────────────────────────────────────────
@@ -36,19 +51,20 @@ def _save(records: List[Dict]) -> None:
 
 def store_decision(decision: Dict) -> Dict:
     """Persist a new decision to the store. Returns the saved record."""
-    records = _load()
+    with _store_lock:
+        records = _load()
 
-    record = {
-        **decision,
-        "id":        decision.get("id") or f"D{uuid.uuid4().hex[:8].upper()}",
-        "timestamp": decision.get("timestamp") or datetime.utcnow().isoformat() + "Z",
-    }
+        record = {
+            **decision,
+            "id":        decision.get("id") or f"D{uuid.uuid4().hex[:8].upper()}",
+            "timestamp": decision.get("timestamp") or datetime.utcnow().isoformat() + "Z",
+        }
 
-    records.insert(0, record)
-    if len(records) > MAX_RECORDS:
-        records = records[:MAX_RECORDS]
+        records.insert(0, record)
+        if len(records) > MAX_RECORDS:
+            records = records[:MAX_RECORDS]
 
-    _save(records)
+        _save(records)
     log.info(f"Feedback saved: {record['id']} action={record.get('action')} lsp={record.get('lsp')}")
     return record
 

@@ -6,6 +6,17 @@
  *
  * This means the RL system works offline (demo mode) AND persists to the server
  * when the backend is running, so signals survive page refreshes and are shared.
+ *
+ * SYNC CONTRACT with api/app/rl_service.py → derive_signals()
+ * ─────────────────────────────────────────────────────────────
+ * deriveSignalsLocal() below mirrors the Python signal logic. Keep these in sync
+ * when updating either file:
+ *   • LSP accept rate threshold: 0.70
+ *   • LSP accept adj cap: Math.min(0.08, 0.02 * total)
+ *   • LSP reject adj cap: Math.min(0.10, 0.02 * rejects)
+ *   • Lane adj: ±0.03 if lane.length ≥ 3, else ±0.01 (negative when >50% rejections)
+ *   • Override adj: Math.min(0.03, 0.005 * overrides.length)
+ *   • Confidence clamp: [0.10, 0.99]
  */
 
 import { saveFeedback as apiSaveFeedback, getSignals as apiGetSignals } from "../api/index";

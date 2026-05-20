@@ -1,5 +1,23 @@
 [
   {
+    "id": "DAA6B06CB",
+    "timestamp": "2026-05-20T19:56:55.909909Z",
+    "action": "ACCEPT",
+    "lsp": "Xpressbees Surface",
+    "awarded_rate": 72000.0,
+    "target_price": null,
+    "neg_gap_pct": null,
+    "quoted_rate": 72000.0,
+    "origin": "Ranjangaon, Maharashtra",
+    "destination": "Hyderabad, Telangana",
+    "truck_type": "20 MT CONTAINER",
+    "urgency": "MEDIUM",
+    "spot_id": "SPOT-006",
+    "ai_recommendation": "ACCEPT",
+    "overridden": true,
+    "note": ""
+  },
+  {
     "id": "D4859ADD1",
     "timestamp": "2026-03-19T19:20:01.365612Z",
     "action": "NEGOTIATE",

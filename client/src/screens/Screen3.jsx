@@ -53,7 +53,7 @@ function ElapsedTimer({ startTime }) {
 export default function Screen3({ scenario, onComplete, onBack }) {
   const [activeStep, setActiveStep] = useState(0);
   const [error, setError]           = useState(null);
-  const [startTime]                 = useState(Date.now);
+  const [startTime]                 = useState(Date.now());
   const called = useRef(false);
 
   // Cycle through steps every ~14s (mapped to ~60s total)
@@ -68,7 +68,11 @@ export default function Screen3({ scenario, onComplete, onBack }) {
     if (called.current) return;
     called.current = true;
     analyseQuotes(scenario.spot_request, scenario.quotes)
-      .then((res) => { setTimeout(() => onComplete(res.data), 600); })
+      .then((res) => {
+        // Jump to the final step visually so all steps appear complete before transition
+        setActiveStep(STEPS.length - 1);
+        setTimeout(() => onComplete(res.data), 900);
+      })
       .catch((err) => {
         setError(
           err?.response?.data?.detail || err.message || "Analysis failed. Please try again."
