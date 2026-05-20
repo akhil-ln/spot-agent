@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s  %(name)s  %(messa
 ENV = os.getenv("ENV", "prod")
 
 # Set prefix only in dev
-API_PREFIX = "/api" if ENV == "dev" else ""
+API_PREFIX = "/api"
 
 app = FastAPI(title="Spot Agent API", version="1.0.0")
 

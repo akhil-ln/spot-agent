@@ -106,6 +106,7 @@ def _get_chain():
             google_api_key=settings.GEMINI_API_KEY,
             temperature=0,
             max_output_tokens=2048,
+            response_mime_type="application/json",
         )
         _chain = PROMPT | llm | StrOutputParser()
     return _chain
@@ -133,11 +134,16 @@ def get_recommendation(
         })
 
         cleaned = re.sub(r"```json|```", "", raw).strip()
-        match   = re.search(r"\{.*\}", cleaned, re.DOTALL)
-        if not match:
-            raise ValueError("No JSON in Gemini response")
+        logger.debug("Gemini raw response: %r", raw)
 
-        parsed = json.loads(match.group())
+        try:
+            parsed = json.loads(cleaned)
+        except json.JSONDecodeError:
+            match = re.search(r"\{.*\}", cleaned, re.DOTALL)
+            if not match:
+                raise ValueError("No JSON in Gemini response")
+            parsed = json.loads(match.group())
+
         return AIRecommendation(**parsed), False
 
     except Exception as e:
