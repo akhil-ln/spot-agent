@@ -43,15 +43,15 @@ def rank(payload: RankRequest):
 
 
 @router.post("/recommend", response_model=RecommendResponse)
-def recommend(payload: RecommendRequest):
+async def recommend(payload: RecommendRequest):
     """Feed ranked quotes to Gemini. Returns ACCEPT/NEGOTIATE/REJECT + reasoning."""
-    rec, used_fallback = get_recommendation(payload.request_meta, payload.ranked_quotes)
+    rec, used_fallback = await get_recommendation(payload.request_meta, payload.ranked_quotes)
     return RecommendResponse(recommendation=rec, used_fallback=used_fallback)
 
 
 # ── Unified orchestrator endpoint ─────────────────────────────────────────────
 @router.post("/analyse", response_model=AnalyseResponse)
-def analyse(payload: AnalyseRequest):
+async def analyse(payload: AnalyseRequest):
     """
     Full pipeline in one call:
       1. Look up lane stats → derive predicted_rate, benchmark_rate, demand_index
@@ -119,7 +119,7 @@ def analyse(payload: AnalyseRequest):
     ranked = score_and_rank(meta, enriched_inputs)
 
     # ── Step 4: AI recommendation ─────────────────────────────────────────────
-    rec, used_fallback = get_recommendation(meta, ranked)
+    rec, used_fallback = await get_recommendation(meta, ranked)
 
     return AnalyseResponse(
         ranked_quotes=ranked,

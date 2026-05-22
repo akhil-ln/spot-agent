@@ -1,10 +1,11 @@
 import re
 import json
+import hashlib
 import logging
+from collections import OrderedDict
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from tenacity import retry, wait_fixed, stop_after_attempt
 from app.config import settings
 from app.models import RequestMeta, ScoredQuote, AIRecommendation
 
@@ -120,21 +121,39 @@ def _get_chain():
             model=settings.GEMINI_MODEL,
             google_api_key=settings.GEMINI_API_KEY,
             temperature=0,
-            max_output_tokens=2048,
+            max_output_tokens=1024,
             response_mime_type="application/json",
-            request_timeout=15,  # Gemini minimum is 10s; 15s gives headroom before fallback
+            request_timeout=10,
+            thinking_budget=0,
         )
         _chain = PROMPT | llm | StrOutputParser()
     return _chain
 
 
-@retry(wait=wait_fixed(1), stop=stop_after_attempt(2), reraise=True)
-def _call_gemini(invocation_kwargs: dict) -> str:
-    """Invoke the Gemini chain with 1 retry on transient failure before falling back."""
-    return _get_chain().invoke(invocation_kwargs)
+_RESPONSE_CACHE: "OrderedDict[str, str]" = OrderedDict()
+_CACHE_MAX = 128
 
 
-def get_recommendation(
+def _cache_key(invocation_kwargs: dict) -> str:
+    payload = json.dumps(invocation_kwargs, sort_keys=True, default=str)
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
+async def _call_gemini(invocation_kwargs: dict) -> str:
+    key = _cache_key(invocation_kwargs)
+    if key in _RESPONSE_CACHE:
+        _RESPONSE_CACHE.move_to_end(key)
+        return _RESPONSE_CACHE[key]
+
+    raw = await _get_chain().ainvoke(invocation_kwargs)
+
+    _RESPONSE_CACHE[key] = raw
+    if len(_RESPONSE_CACHE) > _CACHE_MAX:
+        _RESPONSE_CACHE.popitem(last=False)
+    return raw
+
+
+async def get_recommendation(
     meta: RequestMeta,
     ranked_quotes: list[ScoredQuote],
 ) -> tuple[AIRecommendation, bool]:
@@ -142,7 +161,7 @@ def get_recommendation(
     quotes_text = _build_quotes_text(ranked_quotes)
 
     try:
-        raw = _call_gemini({
+        raw = await _call_gemini({
             "origin":         meta.origin,
             "destination":    meta.destination,
             "truck_type":     meta.truck_type,
@@ -161,9 +180,9 @@ def get_recommendation(
         try:
             parsed = json.loads(cleaned)
         except json.JSONDecodeError:
-            # Strip any leading/trailing non-JSON text and try again
             start, end = cleaned.find('{'), cleaned.rfind('}')
             if start == -1 or end == -1 or start >= end:
+                logger.warning("Gemini returned no JSON object. Raw: %r", raw[:500])
                 raise ValueError("No JSON object found in Gemini response")
             parsed = json.loads(cleaned[start:end + 1])
 
